@@ -1,0 +1,98 @@
+{
+	"info": {
+		"_postman_id": "e538983f-9b16-4c4a-bd61-a093ee964abd",
+		"name": "Loan origination",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29322867"
+	},
+	"item": [
+		{
+			"name": "Submit Loan Application",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"customerName\": \"a Pahwa\",\n  \"customerPhone\": \"9876543210\",\n  \"loanAmount\": 50000,\n  \"loanType\": \"HOME\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/loans",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"loans"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Agent Assignment and Review",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"decision\": \"APPROVE\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/agents/001/loans/0e11df29-f8ad-49fc-8114-2df61d4a5ce9/decision",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"agents",
+						"001",
+						"loans",
+						"0e11df29-f8ad-49fc-8114-2df61d4a5ce9",
+						"decision"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Loan Status Monitoring",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Top Customers API",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Loans by Status with Pagination",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
