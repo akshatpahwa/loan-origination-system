@@ -1,4 +1,4 @@
-package com.example.loan_origination_system;
+package com.bank.loanorigination;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

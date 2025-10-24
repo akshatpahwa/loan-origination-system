@@ -1,4 +1,4 @@
-package com.example.loan_origination_system;
+package com.bank.loanorigination;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
