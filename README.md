@@ -23,8 +23,8 @@ The Loan Origination System is a Spring Boot application designed to manage the 
 
 ## Prerequisites
 
-- **Java 17** or higher
-- **Maven 3.8+**
+- **Java 17** or higher (project is configured for Java 21 in `pom.xml`)
+- **Maven 3.8+`
 
 ## Getting Started
 
@@ -179,3 +179,128 @@ Contributions are welcome! Please fork the repository and create a pull request 
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Run locally with PostgreSQL
+
+This project uses H2 by default for development and testing. The instructions below show how to run the application locally using PostgreSQL — either via Docker (recommended) or a locally installed PostgreSQL instance.
+
+### Prerequisites
+
+- Java 17 or higher (project is configured for Java 21 in `pom.xml`)
+- Maven 3.8+ (or use the project's Maven wrapper: `./mvnw`)
+- Docker (optional, but recommended for running PostgreSQL locally)
+
+### 1) Start PostgreSQL (Docker)
+
+Quick Docker run:
+
+```bash
+docker run --name postgres-local \
+  -e POSTGRES_USER=appuser \
+  -e POSTGRES_PASSWORD=apppass \
+  -e POSTGRES_DB=appdb \
+  -p 5432:5432 \
+  -d postgres:15
+```
+
+Or use a `docker-compose.yml` (recommended if you want a reproducible setup):
+
+```yaml
+version: "3.8"
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: apppass
+      POSTGRES_DB: appdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
+```
+
+Run with:
+
+```bash
+docker compose up -d
+```
+
+### 2) Configure the application
+
+Create or update `src/main/resources/application-local.properties` (or modify `src/main/resources/application.properties`) with your DB settings:
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/appdb
+spring.datasource.username=appuser
+spring.datasource.password=apppass
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# JPA / Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+```
+
+Alternatively you can pass these as environment variables when running the app:
+
+- `SPRING_DATASOURCE_URL`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
+- `SPRING_PROFILES_ACTIVE=local` (if you use a `local` profile file)
+
+### 3) Ensure PostgreSQL JDBC driver is available
+
+Check `pom.xml` for the PostgreSQL driver dependency. If it's not present, add this dependency and rebuild:
+
+```xml
+<dependency>
+  <groupId>org.postgresql</groupId>
+  <artifactId>postgresql</artifactId>
+  <version>42.6.0</version>
+</dependency>
+```
+
+### 4) Run the application pointing to the `local` profile (or with properties/env vars set)
+
+Using the Maven wrapper and `local` profile:
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+Or build the jar and run it directly:
+
+```bash
+./mvnw clean package
+java -jar target/*-SNAPSHOT.jar --spring.profiles.active=local
+```
+
+(Replace `*-SNAPSHOT.jar` with the actual artifact name created by the build.)
+
+### 5) Verify the database connection & troubleshooting
+
+- Check the PostgreSQL container logs:
+
+```bash
+docker logs -f postgres-local
+```
+
+- Test DB connectivity from the host (requires `psql` client):
+
+```bash
+psql postgresql://appuser:apppass@localhost:5432/appdb
+```
+
+### Common issues
+
+- Port 5432 already in use: change the host side port mapping in the Docker command or `docker-compose.yml`.
+- Wrong credentials or DB name: confirm the `spring.datasource.*` settings match the DB you created.
+- Missing JDBC driver: add the PostgreSQL dependency to `pom.xml` and rebuild.
+- Hibernate DDL behavior: `spring.jpa.hibernate.ddl-auto=update` will attempt to alter the schema. For production, prefer `validate` or manage schema migrations with Flyway/Liquibase.
+
+### Notes
+
+- Replace `appdb`, `appuser`, `apppass`, and the artifact name with values appropriate for your environment.
+- You can also use a local Postgres installation instead of Docker — ensure the `spring.datasource.url` points to the correct host/port and that the DB/user exist.
